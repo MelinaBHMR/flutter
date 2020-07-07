@@ -54,11 +54,6 @@ class _RepairerMapPageState extends State<RepairerMapPage> {
     );
   }
 
-  String name, username, avatar;
-  bool isData = false;
-  List<RepairerModel> repairerInfos =[];
-
-
   Future<List<RepairerModel>> fetchRepairer() async {
     final response = await http.get('http://my-json-server.typicode.com/melinaBHMR/flutter_openstreetmap_project/db');
 
