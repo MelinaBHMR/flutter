@@ -64,9 +64,12 @@ class _RepairerMapPageState extends State<RepairerMapPage> {
             print("onLocationUpdate ${pos.toString()}"),
         updateMapLocationOnPositionChange: false,
         showMoveToCurrentLocationFloatingActionButton: true,
+        moveToCurrentLocationFloatingActionButton: Image.asset('assets/repair-btn-current-location.png'),
         zoomToCurrentLocationOnLoad: true,
-        fabBottom: 50,
-        fabRight: 50,
+        fabBottom: 20,
+        fabRight: 20,
+        fabHeight: 80,
+        fabWidth: 80,
         verbose: false);
     return new Scaffold(
       appBar: new AppBar(
@@ -100,14 +103,8 @@ class _RepairerMapPageState extends State<RepairerMapPage> {
             alignment: Alignment.topRight,
             child: FloatingActionButton(onPressed: null, heroTag: 1),
           ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: FloatingActionButton(onPressed: null, heroTag: 2,),
-            ),
         ],
       )
-      /*floatingActionButton: Image.asset('assets/repair-btn-current-location.png'),// MARCHE MAIS QUE POUR UN FLOATING BUTTON
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,*/
     );
   }
 
