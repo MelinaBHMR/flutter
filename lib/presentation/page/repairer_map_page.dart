@@ -30,32 +30,25 @@ class _RepairerMapPageState extends State<RepairerMapPage> {
   void initState(){
     super.initState();
     generateMarkers();
-   // setCustomMapPin();
   }
 
   MapController mapController = MapController();
+  // ignore: close_sinks
   StreamController<LatLng> markerlocationStream = StreamController();
   UserLocationOptions userLocationOptions;
   String name, username, avatar;
   bool isData = false;
   List<RepairerModel> repairerInfos =[];
   List<Marker> markers = [];
- // BitmapDescriptor pinLocationIcon;
   Uint8List markerIcon;
   var infoWindowVisible = false;
-
- /* void setCustomMapMarker(Marker marker) async {
-    if(marker.isSelected == true){
-      markerIcon = await getBytesFromAsset('assets\pin-red.png', 100);
-    }
-   }*/
-
+  bool popupShown = false;
       
+
   @override
   Widget build(BuildContext context) {
-    markerlocationStream.stream.listen((onData) {
-      // print(onData.latitude);
-    });
+
+    markerlocationStream.stream.listen((onData) {});
     userLocationOptions = UserLocationOptions(
         context: context,
         mapController: mapController,
@@ -70,17 +63,23 @@ class _RepairerMapPageState extends State<RepairerMapPage> {
         fabRight: 20,
         fabHeight: 80,
         fabWidth: 80,
-        verbose: false);
+        verbose: false
+    );
+
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Choisissez votre réparateur'),
-        centerTitle: true),
+        centerTitle: true,
+        leading: new BackButton(),
+      ),
+      //bottomNavigationBar: ,
       body: new FlutterMap(
         options: new MapOptions(
           minZoom: 1.0,
-          //center: new LatLng(48.853853, 2.293718),
+          center: new LatLng(48.853853, 2.293718),
           plugins: [
             UserLocationPlugin(),
+            PopupMarkerPlugin()
           ],
           interactive: true,
           onTap: (_) => _popupLayerController.hidePopup(),
@@ -90,22 +89,28 @@ class _RepairerMapPageState extends State<RepairerMapPage> {
             urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             subdomains: ['a', 'b', 'c'],
           ),
-          new MarkerLayerOptions(
-            markers: markers,
-          ),
+          PopupMarkerLayerOptions(
+          markers: markers,
+          popupSnap: PopupSnap.top,
+          popupController: _popupLayerController,
+          popupBuilder: (_, Marker marker){
+            if(marker is RepairerMarker){
+              return RepairerMarkerPopup(repairer: marker.repairerModel);
+            }
+            return Card(child: const Text('Error : pas d\'infos disponibles'));
+          },
+        ),
           userLocationOptions
         ],
-        mapController: mapController,
+        //mapController: mapController,
       ),
-      floatingActionButton: Stack(
-        children: <Widget>[
-          Align(
-            alignment: Alignment.topRight,
-            child: FloatingActionButton(onPressed: null, heroTag: 1),
-          ),
-        ],
-      )
+      //floatingActionButton: Image.asset('assets/repair-zoom.png', width: 80.0,),
+     // floatingActionButtonLocation: FloatingActionButtonLocation.miniStartTop,
     );
+  }
+
+  void showPopupForFirstMarker() {
+    _popupLayerController.togglePopup(markers.first);
   }
 
   Future<List<RepairerModel>> fetchRepairer() async {
@@ -131,69 +136,8 @@ class _RepairerMapPageState extends State<RepairerMapPage> {
   void generateMarkers() async {
     repairerInfos = await fetchRepairer();
     repairerInfos.forEach((element){
-      markers.add(new Marker(
-        point: new LatLng(double.parse(element.latitude), double.parse(element.longitude)),
-        width: 200.0,
-        height: 200.0,
-        builder: (context) => 
-          IconButton(
-            icon: Image(image: AssetImage('assets/pin-black.png')), 
-            onPressed: () { 
-              IconButton(
-                icon: Image(image: AssetImage('assets/pin-red.png')), 
-                onPressed: () => new PopupMarkerLayerOptions(
-                  popupBuilder: (context, Marker marker) { 
-                    return new RepairerMarkerPopup(repairer: element);
-                  },
-                ));
-            },)
-      ));
+      markers.add(new RepairerMarker(repairerModel: element));
     });
     print(markers);
   }
-/*
- Stack _buildCustomMarker() {
-    return Stack(
-      children: <Widget>[
-        popup(),
-        marker(),
-      ],
-    );
-  }
-
-  Opacity popup() {
-    return Opacity(
-      opacity: infoWindowVisible ? 1.0 : 0.0,
-      child: Container(
-        alignment: Alignment.bottomCenter,
-        width: 279.0,
-        height: 256.0,
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage("assets/images/ic_info_window.png"),
-                fit: BoxFit.cover)),
-        //child: CustomPopup(key: key),
-      ),
-    );
-  }
-
-  Opacity marker() {
-    return Opacity(
-      child: Container(
-          alignment: Alignment.bottomCenter,
-          child: Image.asset(
-            'assets/pin-black.png',
-            width: 49,
-            height: 65,
-          )),
-      opacity: infoWindowVisible ? 0.0 : 1.0,
-    );
-  }
-
-  Future<Uint8List> getBytesFromAsset(String path, int width) async {
-    ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
-    ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png)).buffer.asUint8List();
-  }*/
 }

@@ -1,5 +1,10 @@
 
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong/latlong.dart';
+
 class RepairerModel {
 
   final String id;
@@ -40,6 +45,23 @@ class RepairerModel {
       parsedJson['infosOuverture2'],
       parsedJson['infosOuverture3']
     );
-    }
-
+  }
 }
+  
+class RepairerMarker extends Marker {
+  RepairerMarker({@required this.repairerModel})
+      : super(
+          anchorPos: AnchorPos.align(AnchorAlign.top),
+          height: 200.0,
+          width: 200.0,
+          point: LatLng(double.parse(repairerModel.latitude), double.parse(repairerModel.longitude)),
+          builder: (BuildContext ctx) => IconButton(
+            icon: Image(image: AssetImage('assets/pin-black.png')), 
+            onPressed: null
+            )
+        );
+
+  final RepairerModel repairerModel;
+}
+
+
