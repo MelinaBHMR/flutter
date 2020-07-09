@@ -9,6 +9,7 @@ import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'package:flutter_openstreetmap_project/data/models/repairer_marker_model.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_openstreetmap_project/presentation/widgets/repairer_marker_popup_widget.dart';
+import 'package:flutter_openstreetmap_project/presentation/widgets/tabbed_appbar_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong/latlong.dart';
 import 'package:user_location/user_location.dart';
@@ -43,7 +44,7 @@ class _RepairerMapPageState extends State<RepairerMapPage> {
   Uint8List markerIcon;
   var infoWindowVisible = false;
   bool popupShown = false;
-      
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -67,12 +68,6 @@ class _RepairerMapPageState extends State<RepairerMapPage> {
     );
 
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Choisissez votre réparateur'),
-        centerTitle: true,
-        leading: new BackButton(),
-      ),
-      //bottomNavigationBar: ,
       body: new FlutterMap(
         options: new MapOptions(
           minZoom: 1.0,
