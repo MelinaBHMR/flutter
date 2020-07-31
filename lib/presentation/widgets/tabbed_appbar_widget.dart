@@ -1,60 +1,90 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_openstreetmap_project/presentation/page/repairer_list_page.dart';
 import 'package:flutter_openstreetmap_project/presentation/page/repairer_map_page.dart';
 
-class TabbedAppBarSample extends StatelessWidget {
 
-  const TabbedAppBarSample({Key key}) : super(key: key);
-  
+class TabbedAppBarSample extends StatefulWidget {
+  TabbedAppBarSample({Key key, this.title}) : super(key: key);
+  final String title;
 
   @override
-  Widget build(BuildContext context) {
+  _TabbedAppBarSampleState createState() => _TabbedAppBarSampleState();
+}
 
-    return MaterialApp(
-      home: DefaultTabController(
+class _TabbedAppBarSampleState extends State<TabbedAppBarSample> with SingleTickerProviderStateMixin {
+  
+  TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = new TabController(vsync: this, length: choices.length);
+  }
+
+   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
         length: choices.length,
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.red,
-            title: new Text('Choisissez votre réparateur'),
+            title: Text('Choisissez votre réparateur'),
             centerTitle: true,
-            leading: new BackButton(),
+            leading: IconButton(icon: Icon(Icons.arrow_back), 
+              onPressed: (){
+                Navigator.pop(context);
+              }),
           ),
-          body: Scaffold(
-            appBar: new PreferredSize(
-              preferredSize: Size.fromHeight(kToolbarHeight),
-              child: new Container(
-                color: Colors.brown[50],
-                child: new SafeArea(
-                 child: Column(
-                   children: <Widget>[
-                    new Expanded(child: new Container()),
-                    new TabBar(
-                      labelStyle: Theme.of(context).textTheme.headline6,
-                      isScrollable: true,
-                      tabs: choices.map<Widget>((Choice choice) {
-                        return Tab(
-                          text: choice.title,
-                        );
-                      }).toList(),
-                    ),
-                   ]
-                 )
-                )
-              ),
+          body : Scaffold(
+              appBar :PreferredSize(
+                preferredSize:  Size.fromHeight(60.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                      TabBar(
+                        labelPadding: EdgeInsets.symmetric(horizontal: 72.5),
+                        controller: _tabController,
+                        unselectedLabelColor: Colors.black,
+                        indicatorColor: Colors.red,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        indicatorWeight: 4.0,
+                        labelColor: Colors.red,
+                        labelStyle:
+                          TextStyle(
+                            fontSize: 15.0,
+                            fontWeight: FontWeight.bold
+                          ),
+                        isScrollable: true,
+                        tabs: choices.map<Tab>((Choice choice) {
+                          return 
+                            Tab(
+                              text: choice.title,
+                            );
+                        }).toList(),
+                      ),
+                    ],
+                  )
+                ),
+              body : TabBarView(
+                controller: _tabController,
+                children: choices.map<Widget>((Choice choice) {
+                return ChoiceCard(choice: choice);
+                  }).toList(),
+              )
             ),
-            body: TabBarView(
-              children: choices.map<Widget>((Choice choice) {
-               return ChoiceCard(choice: choice);
-              }).toList(),
-            ),
-          )
-        ),
-      ),
-    );
+      ));
   }
-}
+} 
+
   
 
 
@@ -65,9 +95,9 @@ class Choice {
 }
 
 
-const List<Choice> choices = const <Choice>[
-  const Choice(title: 'Carte'),
-  const Choice(title: 'Liste'),
+const List<Choice> choices = <Choice>[
+  Choice(title: 'Carte'),
+  Choice(title: 'Liste'),
 ];
      
 
@@ -79,13 +109,9 @@ class ChoiceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if(choice.title == 'Carte'){
-      return MaterialApp(
-        home: RepairerMapPage(),
-      );
-    }else {
-      return MaterialApp(
-        home: RepairerListPage(),
-      );
+      return RepairerMapPage();
+    }else{
+      return RepairerListPage();
     }
     
   }
